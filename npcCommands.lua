@@ -231,6 +231,7 @@ npcCommands.handleCommand = function(command, chat, id)
                 local success, data = pcall(strToTable, result);
                 if success then
                     Npcs = data;
+                    npcCommands.saveNpcsToFile();
                     Log.i('NPCs carregados com sucesso.');
                 else
                     Log.e('Erro ao decodificar o txt: ' .. data);
