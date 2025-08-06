@@ -294,7 +294,6 @@ npcCommands.handleCommand = function(command, chat, id)
             outOfCharTextStyle = {
                 color = parsecolor(color),
             },
-            parseCommonMarkStrongEmphasis = false,
             parseInitialCaps = false,
             parseOutOfChar = false,
             parseSmileys = false,
