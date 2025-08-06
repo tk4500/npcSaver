@@ -234,7 +234,7 @@ npcCommands.handleCommand = function(command, chat, id)
                 local result = string.char(table.unpack(jsonData));
                 local success, data = pcall(json.decode, result);
                 if success then
-                    Npcs = data;
+                    Npcs[id] = data;
                     npcCommands.saveNpcsToFile();
                     Log.i('NPCs carregados com sucesso.');
                 else
