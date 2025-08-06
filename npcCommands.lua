@@ -1,5 +1,6 @@
 require("ndb.lua");
 require("dialogs.lua");
+local json = require("json.lua");
 local npcCommands = {};
 
 npcCommands.saveNpcsToFile = function()
@@ -61,11 +62,11 @@ npc list - Lista todos os NPCs salvos.
 npc clear - Remove todos os NPCs salvos.
 npc export - Exporta a lista de NPCs salvos.
 npc import - Importa NPCs de um arquivo.
-npc add <nome> - Salva o NPC com o nome especificado.
-npc edit <nome> <atributo>(opcional) - Edita o NPC com o nome especificado. Se um atributo for fornecido, edita apenas esse atributo.
-npc remove <nome> - Remove o NPC com o nome especificado.
-npc info <nome> - Mostra informações sobre o NPC com o nome especificado.
-<nome_do_npc> <mensagem> - Envia uma mensagem com o NPC especificado. O NPC deve estar salvo.
+npc add <codigo> - Salva o NPC com o codigo especificado.
+npc edit <codigo> <atributo>(opcional) - Edita o NPC com o codigo especificado. Se um atributo for fornecido, edita apenas esse atributo.
+npc remove <codigo> - Remove o NPC com o codigo especificado.
+npc info <codigo> - Mostra informações sobre o NPC com o codigo especificado.
+<codigo_do_npc> <mensagem> - Envia uma mensagem com o NPC especificado. O NPC deve estar salvo.
 ]]
 npcCommands.help = { command = '/npc', description = helpMessage }
 
@@ -207,9 +208,12 @@ npcCommands.handleCommand = function(command, chat, id)
     end
 
     if command == 'export' then
-        local stream = VHD.openFile("npcs.txt", 'r');
+        local npcsJson = json.encode(Npcs[id]);
+        local stream = Utils.newMemoryStream();
+        stream:writeBinary("utf8", npcsJson);
+        stream.position = 0;
         if stream then
-            Dialogs.saveFile("salvando o txt dos npcs", stream, "npcs.txt", "text/plain", function()
+            Dialogs.saveFile("salvando o json dos npcs da mesa" .. chat.room.nome, stream, "npcs.json", "application/json", function()
                 stream:close();
             end, function()
                 stream:close();
@@ -218,17 +222,17 @@ npcCommands.handleCommand = function(command, chat, id)
         return;
     end
     if command == 'import' then
-        Dialogs.openFile("Importar NPCs", ".txt", false, function(files)
+        Dialogs.openFile("Importar NPCs", ".json", false, function(files)
             local file = files[1];
             if not file then
                 chat:writeEx('Nenhum arquivo selecionado.');
                 return;
             end
-            local txtData = {};
-            local lidos = file.stream:read(txtData, file.stream.size)
+            local jsonData = {};
+            local lidos = file.stream:read(jsonData, file.stream.size)
             if lidos > 0 then
-                local result = string.char(table.unpack(txtData));
-                local success, data = pcall(strToTable, result);
+                local result = string.char(table.unpack(jsonData));
+                local success, data = pcall(json.decode, result);
                 if success then
                     Npcs = data;
                     npcCommands.saveNpcsToFile();
@@ -254,22 +258,11 @@ npcCommands.handleCommand = function(command, chat, id)
         end
         local npcList = Npcs[id];
         if npcList[npc] then
-            chat:writeEx('NPC já existe com esse nome.');
+            chat:writeEx('NPC já existe com esse codigo.');
             return;
         end
         npcList[npc] = {};
-        npcList[npc].talemarkOptions = {
-            parseCharActions = false,
-            parseCharEmDashSpeech = false,
-            parseCharQuotedSpeech = false,
-            parseCommonMarkStrongEmphasis = false,
-            parseHeadings = false,
-            parseHorzLines = false,
-            parseInitialCaps = false,
-            parseOutOfChar = false,
-            parseSmileys = false,
-            trimTexts = false,
-        };
+        
         npcList[npc].impersonation = {
             mode = "character",
             avatar = "",
@@ -283,15 +276,31 @@ npcCommands.handleCommand = function(command, chat, id)
                 if imageURL then
                     npcList[npc].impersonation.avatar = imageURL;
                 end
-                Dialogs.choose("Selecione o genero do personagem", { "masculine", "feminine", "neuter" },
-                    function(a, b, gender)
-                        if gender then
-                            npcList[npc].impersonation.gender = gender;
-                        end
-                        Npcs[id] = npcList;
-                        npcCommands.saveNpcsToFile();
-                    end
-                )
+            local promise = Dialogs.asyncSelectTalemarkColor();
+            local r, color = pawait(promise);
+            npcList[npc].talemarkOptions = {
+                defaultTextStyle = {
+                color = parsecolor(color),
+            },
+            charActionTextStyle = {
+                color = parsecolor(color),
+            },
+            charEmDashSpeechTextStyle = {
+                color = parsecolor(color),
+            },
+            charQuotedSpeechTextStyle = {
+                color = parsecolor(color),
+            },
+            outOfCharTextStyle = {
+                color = parsecolor(color),
+            },
+            parseCommonMarkStrongEmphasis = false,
+            parseInitialCaps = false,
+            parseOutOfChar = false,
+            parseSmileys = false,
+        };
+                Npcs[id] = npcList;
+                npcCommands.saveNpcsToFile();
             end
             )
         end

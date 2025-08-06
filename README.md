@@ -12,7 +12,7 @@ Este é um plugin para a plataforma **RRPG Firecast**, desenvolvido para permiti
 *   **Edição Interativa**: Edite os atributos de um NPC (nome, avatar, gênero) através de diálogos interativos dentro do Firecast, sem precisar mexer em arquivos de texto.
 *   **Customização Avançada com Talemark**: Personalize a aparência das mensagens de cada NPC, definindo cores de texto, fundo e estilos (negrito, itálico, etc.) através de um menu de edição detalhado.
 *   **Gerenciamento Completo via Chat**: Adicione, remova, liste e edite seus NPCs usando comandos de chat simples e intuitivos.
-*   **Importação e Exportação**: Faça backup de toda a sua lista de NPCs em um arquivo `.txt` e importe-a facilmente em outras mesas ou compartilhe com outros mestres.
+*   **Importação e Exportação**: Faça backup de toda a sua lista de NPCs em um arquivo `.json` e importe-a facilmente em outras mesas ou compartilhe com outros mestres.
 
 ## Instalação do Plugin
 
