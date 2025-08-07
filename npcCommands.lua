@@ -284,8 +284,9 @@ npcCommands.handleCommand = function(command, chat, id)
                 end
             local promise = Dialogs.asyncSelectTalemarkColor();
             local r, color = pawait(promise);
-            if not string.find(input, "[§K") then
-                npcList[npc].impersonation.name = "[§K"..color.."]" .. input;
+            local sub = "%[§K"
+            if not string.find(input, sub) then
+                npcList[npc].impersonation.name = sub..color.."]" .. input;
             end
             npcList[npc].talemarkOptions = {
                 defaultTextStyle = {
