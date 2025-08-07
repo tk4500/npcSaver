@@ -132,7 +132,7 @@ end
 
 local function npcEdit(npc, attribute, id, npcName)
     if attribute == 'avatar' then
-        Dialogs.selectImageURL(npc.avatar, function(imageURL)
+        Dialogs.selectImageURL(npc.impersonation.avatar, function(imageURL)
             if imageURL then
                 Npcs[id][npcName].impersonation.avatar = imageURL;
                 Log.i("npcCommands", "Avatar atualizado para: " .. imageURL);
@@ -140,7 +140,7 @@ local function npcEdit(npc, attribute, id, npcName)
             end
         end)
     elseif attribute == 'name' then
-        Dialogs.inputQuery("NPC ADD", "Digite o nome do NPC:", npcName, function(input)
+        Dialogs.inputQuery("NPC ADD", "Digite o nome do NPC:", npc.impersonation.name, function(input)
             if input and input ~= '' then
                 Npcs[id][npcName].impersonation.name = input;
                 npcCommands.saveNpcsToFile();
