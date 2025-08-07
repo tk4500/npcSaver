@@ -193,6 +193,12 @@ npcCommands.handleCommand = function(command, chat, id)
         chat:writeEx(helpMessage);
         return;
     end
+    if command == 'clear' then
+        Npcs[id] = {};
+        npcCommands.saveNpcsToFile();
+        chat:writeEx('Todos os NPCs foram removidos com sucesso.');
+        return;
+    end
     if command == 'list' then
         local npcList = Npcs[id];
         if not npcList then
@@ -278,21 +284,29 @@ npcCommands.handleCommand = function(command, chat, id)
                 end
             local promise = Dialogs.asyncSelectTalemarkColor();
             local r, color = pawait(promise);
+            if not string.find(input, "[§K") then
+                npcList[npc].impersonation.name = "[§K"..color.."]" .. input;
+            end
             npcList[npc].talemarkOptions = {
                 defaultTextStyle = {
                 color = parsecolor(color),
+                bold = true,
             },
             charActionTextStyle = {
                 color = parsecolor(color),
+                bold = true,
             },
             charEmDashSpeechTextStyle = {
                 color = parsecolor(color),
+                bold = true,
             },
             charQuotedSpeechTextStyle = {
                 color = parsecolor(color),
+                bold = true,
             },
             outOfCharTextStyle = {
                 color = parsecolor(color),
+                bold = true,
             },
             parseInitialCaps = false,
             parseOutOfChar = false,
@@ -332,6 +346,7 @@ npcCommands.handleCommand = function(command, chat, id)
                 end)
         end
     end
+
 end
 
 npcCommands.sendMessage = function(npc, chat, message)
